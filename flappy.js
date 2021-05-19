@@ -3,7 +3,7 @@ let canvas
 let context
 let secondsPassed = 0;
 let oldTimeStamp = 0;
-let fps;
+let fps
 
 let movingSpeed = 50
 let rectX = 0
@@ -16,7 +16,6 @@ const GRAVITY = 10
 let pipes = []
 let pipePairs = []
 let pipeTimer = 0
-const GAP_HEIGHT = 90
 
 const PIPE_HEIGHT = 288
 const PIPE_WIDTH = 70
@@ -177,15 +176,13 @@ class PlayState extends BaseState {
     }
 
     enter(){
-        scrolling = true
+        scrolling = true 
     }
     update(dt){
-        if (!pause){
-
-        
-
+        if (!pause){  
         this.timer += dt
-        if (this.timer>2){
+    
+        if (this.timer > getRandomInt(2,100)){
             console.log('create pipe')
             // modify the last y coordinate we placed so pipe gaps aren't too far
             // no higher than 10 below the top edge of the screen, and
@@ -193,7 +190,6 @@ class PlayState extends BaseState {
             let y = Math.max(-PIPE_HEIGHT +10, Math.min(lastY + (Math.random() * (20+20)-20),canvas.height-90 -PIPE_HEIGHT))
             this.lastY = y
             this.pipePairs.push(new PipePair(y))
-            //pipes.push(new Pipe())
             this.timer=0
         }
 
@@ -256,7 +252,7 @@ class Pipe {
         this.height = 288
         this.x = canvas.width
         this.y = y
-        this.orientation = orientation 
+        this.orientation = orientation
         //this.y = Math.random() * ((canvas.height -10) - (canvas.height/4)) + canvas.height/4
     }
     update(dt){
@@ -284,8 +280,9 @@ class PipePair{
     constructor(y){
         this.x = canvas.width + 32
         this.y = y
+        this.gap = getRandomInt(90,160)
         this.remove = false
-        this.pipes = {upper: new Pipe('top', this.y), lower: new Pipe('bottom', this.y + PIPE_HEIGHT + GAP_HEIGHT )}
+        this.pipes = {upper: new Pipe('top', this.y), lower: new Pipe('bottom', this.y + PIPE_HEIGHT + this.gap )}
         this.score = false
     }
     update(dt){
@@ -371,7 +368,6 @@ const ground = new Image()
 ground.src = './images/ground.png'
 const pipeImage = new Image()
 pipeImage.src = './images/pipe.png'
-let gameSpeed = 2
 let backgroundScroll = 0
 let groundScroll = 0
 const backgroundScrollSpeed = 30
@@ -396,6 +392,18 @@ window.addEventListener('keydown', function(e){
         pause = !pause
     } 
 })
+
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+}
 
 function updateBackground(){
     ctx.drawImage(background, -backgroundScroll, 0 )
