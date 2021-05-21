@@ -26,6 +26,7 @@ let lastY = -PIPE_HEIGHT + (Math.random() * (80-1) + 1) + 20
 
 let scrolling = true
 let pause = false
+let dead = false
 let returnKeyPressed = false
 
 hurtSound = new Audio('./sounds/hurt.wav')
@@ -34,6 +35,17 @@ pauseSound = new Audio('./sounds/pause.wav')
 scoreSound = new Audio('./sounds/score.wav')
 explosionSound = new Audio('./sounds/explosion.wav')
 gameMusic = new Audio('./sounds/marios_way.mp3')
+
+const birdFramesSrc = [
+    './images/Idle/frame-1.png',
+    './images/Idle/frame-2.png',
+    './images/Idle/frame-3.png',
+    './images/Idle/frame-4.png',
+    './images/Idle/frame-5.png',
+    './images/Idle/frame-6.png',
+    './images/Idle/frame-7.png',
+    './images/Idle/frame-8.png'
+]
 
 // ---------------CLASSES-----------------------------------------  
 
@@ -113,6 +125,7 @@ class ScoreState extends BaseState {
     }
     enter(params){
         this.score = params
+        dead = false
     }
 
     update(dt){
@@ -165,7 +178,6 @@ class PlayState extends BaseState {
         this.timer = 0
         this.score = 0
         this.lastY = -PIPE_HEIGHT + (Math.random() * (80-1) + 1) + 20
-        this.isPaused = false
     }
     init(){
         // this.bird = new Bird()
@@ -193,7 +205,7 @@ class PlayState extends BaseState {
             this.timer=0
         }
 
-        this.bird.update(secondsPassed)
+        this.bird.update(dt)
 
         if (this.bird.y > canvas.height -15){
             hurtSound.play()
@@ -217,11 +229,15 @@ class PlayState extends BaseState {
             if ( (this.bird.collides(this.pipePairs[i].pipes.upper)) || 
                  (this.bird.collides(this.pipePairs[i].pipes.lower)) ){
                      //gStateMachine.change('title')
+                     birdImg.src = './images/Dizzy/frame-1.png',
                      explosionSound.play()
                      hurtSound.play()
                      gameMusic.pause()
-                     gStateMachine.change('score', this.score)
-                        scrolling = false
+                     dead = true
+                     console.log('GAME OVER', dead)
+                     setTimeout(()=>gStateMachine.change('score', this.score),250)
+                     //gStateMachine.change('score', this.score)
+                     scrolling = false
             }
             this.pipePairs[i].update(dt)
             if (this.pipePairs[i].remove){
@@ -302,22 +318,42 @@ class PipePair{
 
 class Bird{
     constructor(){
-        this.image = "./images/bird.png"
-        this.width = 38
-        this.height = 24
+        this.width = 50
+        this.height = 43
+        // this.width = 1157
+        // this.height = 1002
         this.x = canvas.width / 2 - (this.width/2)
         this.y = canvas.height / 2 - (this.height/2)
         this.dy = 0
+        this.frame = -1
+        this.staggerFrames = 12
+        this.gameFrame = 0
+
 
     }
     render(){
-        context.drawImage(birdImg, this.x, this.y )
-
+        //birdImg.src = birdFramesSrc[this.frame]
+        // context.drawImage(birdImg, this.x, this.y )
+        context.drawImage(birdImg,0,0,1157,1002,this.x, this.y, this.width ,this.height)
     }
 
     update(dt){
+        if (this.gameFrame % this.staggerFrames === 0){
+            if (this.frame < 7)
+            {
+                this.frame++
+
+            }else{
+                this.frame = 0
+
+            }
+        }
+        birdImg.src = birdFramesSrc[this.frame]
+
+        this.gameFrame++
         this.dy += GRAVITY * dt
         this.y += this.dy
+
          if (spacePressed === true){
              this.dy -= 4
              jumpSound.play()
@@ -347,7 +383,7 @@ function init(){
     window.requestAnimationFrame(gameLoop)   
     bird = new Bird()
     birdImg = new Image()
-    birdImg.src = bird.image
+    //birdImg.src = birdFramesSrc[7]
          
 }
 
@@ -374,6 +410,7 @@ const backgroundScrollSpeed = 30
 const groundScrollSpeed = 60
 const BACKGROUND_LOOPING_POINT = 413
 let spacePressed = false
+
 
 
 window.addEventListener('keydown', function(e){
@@ -424,10 +461,14 @@ function gameLoop(timeStamp) {
     fps = Math.round(1 / secondsPassed);
     //console.log(fps)
 
-    //gStateMachine.update(secondsPassed)
     // Perform the drawing operation
-    update(secondsPassed)
-    draw();
+    draw()
+
+    if (!dead){
+        //gStateMachine.update(secondsPassed)
+        update(secondsPassed)
+    }
+
 
     // The loop function has reached it's end. Keep requesting new frames
     window.requestAnimationFrame(gameLoop);
