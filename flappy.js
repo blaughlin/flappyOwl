@@ -30,12 +30,17 @@ let dead = false
 let returnKeyPressed = false
 
 hurtSound = new Audio('./sounds/hurt.wav')
+hurtSound.setAttribute("preload", "auto")
 jumpSound = new Audio('./sounds/jump.wav')
+jumpSound.setAttribute("preload", "auto")
 pauseSound = new Audio('./sounds/pause.wav')
+pauseSound.setAttribute("preload", "auto")
 scoreSound = new Audio('./sounds/score.wav')
+scoreSound.setAttribute("preload", "auto")
 explosionSound = new Audio('./sounds/explosion.wav')
+explosionSound.setAttribute("preload", "auto")
 gameMusic = new Audio('./sounds/marios_way.mp3')
-
+gameMusic.setAttribute("preload", "auto")
 const birdFramesSrc = [
     './images/Idle/frame-1.png',
     './images/Idle/frame-2.png',
@@ -377,6 +382,7 @@ class Bird{
 window.onload = init
 let bird
 let birdImg
+
 function init(){
     canvas = document.getElementById('canvas')
     context = canvas.getContext('2d')
@@ -386,6 +392,16 @@ function init(){
     //birdImg.src = birdFramesSrc[7]
          
 }
+
+
+// hurtSound = new Audio('./sounds/hurt.wav')
+// jumpSound = new Audio('./sounds/jump.wav')
+// pauseSound = new Audio('./sounds/pause.wav')
+// scoreSound = new Audio('./sounds/score.wav')
+// explosionSound = new Audio('./sounds/explosion.wav')
+// gameMusic = new Audio('./sounds/marios_way.mp3')
+
+
 
 const gStateMachine = new StateMachine({
     title: () => new TitleScreenState(),
@@ -417,6 +433,7 @@ window.addEventListener('keydown', function(e){
     console.log(e.code, 'down', spacePressed)
     if (e.code === "Space"){
         spacePressed = true
+
     } 
     if (e.code === 'Enter'){
         returnKeyPressed = true
