@@ -384,7 +384,7 @@ class Bird{
 
          if (spacePressed === true){
              this.dy -= 4
-             jumpSound.play()
+             
          }
         spacePressed = false
     }
@@ -451,6 +451,7 @@ window.addEventListener('keydown', function(e){
     console.log(e.code, 'down', spacePressed)
     if (e.code === "Space"){
         spacePressed = true
+        jumpSound.play()
 
     } 
     if (e.code === 'Enter'){
