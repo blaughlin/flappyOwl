@@ -451,6 +451,7 @@ window.addEventListener('keydown', function(e){
     console.log(e.code, 'down', spacePressed)
     if (e.code === "Space"){
         spacePressed = true
+        jumpSound.src = './sounds/jump.wav'
         jumpSound.play()
 
     } 
