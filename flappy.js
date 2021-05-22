@@ -9,8 +9,8 @@ let movingSpeed = 50
 let rectX = 0
 let rectY = 0
 
-const PIPE_SCROLL = -60
-const PIPE_SPEED = 60
+let PIPE_SCROLL = -60
+let PIPE_SPEED = 60
 const GRAVITY = 10
 
 let pipes = []
@@ -156,6 +156,8 @@ class TitleScreenState extends BaseState{
     }
     enter(){
         scrolling = true
+        PIPE_SCROLL = -60
+        PIPE_SPEED = 60
     }
     update(dt){
         if (returnKeyPressed === true){
@@ -195,6 +197,10 @@ class PlayState extends BaseState {
     enter(){
         scrolling = true 
         dizzy = false
+        PIPE_SCROLL = -60
+        PIPE_SPEED = 60
+        backgroundScrollSpeed = 30
+        groundScrollSpeed = 60
     }
     update(dt){
         if (!pause){  
@@ -236,13 +242,19 @@ class PlayState extends BaseState {
                  (this.bird.collides(this.pipePairs[i].pipes.lower)) ){
                      //gStateMachine.change('title')
                      //birdImg.src = './images/Dizzy/frame-1.png',
+                     if (!dizzy){
                      explosionSound.play()
                      hurtSound.play()
+                     }
                      gameMusic.pause()
                      dizzy = true
+                     PIPE_SPEED = 0
+                     PIPE_SCROLL = 0
+                     backgroundScrollSpeed = 0
+                     groundScrollSpeed = 0
                      dead = true
                      console.log('GAME OVER', dead)
-                     setTimeout(()=>gStateMachine.change('score', this.score),600)
+                     //setTimeout(()=>gStateMachine.change('score', this.score),600)
                      //gStateMachine.change('score', this.score)
                      scrolling = false
             }
@@ -309,6 +321,7 @@ class PipePair{
         this.score = false
     }
     update(dt){
+        if (dizzy){PIPE_SPEED = 0}
         if (this.x > -PIPE_WIDTH){
             this.x = this.x - PIPE_SPEED *dt
             this.pipes.upper.x = this.x
@@ -427,8 +440,8 @@ const pipeImage = new Image()
 pipeImage.src = './images/pipe.png'
 let backgroundScroll = 0
 let groundScroll = 0
-const backgroundScrollSpeed = 30
-const groundScrollSpeed = 60
+let backgroundScrollSpeed = 30
+let groundScrollSpeed = 60
 const BACKGROUND_LOOPING_POINT = 413
 let spacePressed = false
 
@@ -486,10 +499,10 @@ function gameLoop(timeStamp) {
     // Perform the drawing operation
     draw()
 
-    if (!dead){
-        //gStateMachine.update(secondsPassed)
-        update(secondsPassed)
-    }
+  
+    //gStateMachine.update(secondsPassed)
+    update(secondsPassed)
+    
 
 
     // The loop function has reached it's end. Keep requesting new frames
