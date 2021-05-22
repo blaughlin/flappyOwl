@@ -28,7 +28,7 @@ let scrolling = true
 let pause = false
 let dead = false
 let returnKeyPressed = false
-
+let dizzy = false
 hurtSound = new Audio('./sounds/hurt.wav')
 hurtSound.setAttribute("preload", "auto")
 jumpSound = new Audio('./sounds/jump.wav')
@@ -234,13 +234,14 @@ class PlayState extends BaseState {
             if ( (this.bird.collides(this.pipePairs[i].pipes.upper)) || 
                  (this.bird.collides(this.pipePairs[i].pipes.lower)) ){
                      //gStateMachine.change('title')
-                     birdImg.src = './images/Dizzy/frame-1.png',
+                     //birdImg.src = './images/Dizzy/frame-1.png',
                      explosionSound.play()
                      hurtSound.play()
                      gameMusic.pause()
+                     dizzy = true
                      dead = true
                      console.log('GAME OVER', dead)
-                     setTimeout(()=>gStateMachine.change('score', this.score),250)
+                     setTimeout(()=>gStateMachine.change('score', this.score),600)
                      //gStateMachine.change('score', this.score)
                      scrolling = false
             }
@@ -339,14 +340,19 @@ class Bird{
 
     }
     render(){
-        if (dead){this.spriteHeight=1004, this.frame=0}
         //birdImg.src = birdFramesSrc[this.frame]
         // context.drawImage(birdImg, this.x, this.y )
+        if (dizzy){
+            this.spriteHeightOrigin=1004
+            this.frame=0
+        }
+
         context.drawImage(birdImg,this.frame * 1159,this.spriteHeightOrigin,
             1159,this.spriteHeight,this.x, this.y, this.width ,this.height)
     }
 
     update(dt){
+
         if (this.gameFrame % this.staggerFrames === 0){
             if (this.frame < 7)
             {
@@ -357,7 +363,6 @@ class Bird{
 
             }
         }
-        //birdImg.src = birdFramesSrc[this.frame]
 
         this.gameFrame++
         this.dy += GRAVITY * dt
