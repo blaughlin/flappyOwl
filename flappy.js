@@ -333,14 +333,17 @@ class Bird{
         this.frame = -1
         this.staggerFrames = 12
         this.gameFrame = 0
+        this.spriteHeightOrigin = 0
+        this.spriteHeight = 1004
 
 
     }
     render(){
+        if (dead){this.spriteHeight=1004, this.frame=0}
         //birdImg.src = birdFramesSrc[this.frame]
         // context.drawImage(birdImg, this.x, this.y )
-        context.drawImage(birdImg,this.frame * 1736,0,
-            1736.625,1463,this.x, this.y, this.width ,this.height)
+        context.drawImage(birdImg,this.frame * 1159,this.spriteHeightOrigin,
+            1159,this.spriteHeight,this.x, this.y, this.width ,this.height)
     }
 
     update(dt){
@@ -390,7 +393,7 @@ function init(){
     window.requestAnimationFrame(gameLoop)   
     bird = new Bird()
     birdImg = new Image()
-    birdImg.src = './images/owl2.png'
+    birdImg.src = './images/spriteSheet.png'
          
 }
 
