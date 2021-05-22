@@ -339,7 +339,8 @@ class Bird{
     render(){
         //birdImg.src = birdFramesSrc[this.frame]
         // context.drawImage(birdImg, this.x, this.y )
-        context.drawImage(birdImg,0,0,1157,1002,this.x, this.y, this.width ,this.height)
+        context.drawImage(birdImg,this.frame * 1736,0,
+            1736.625,1463,this.x, this.y, this.width ,this.height)
     }
 
     update(dt){
@@ -353,7 +354,7 @@ class Bird{
 
             }
         }
-        birdImg.src = birdFramesSrc[this.frame]
+        //birdImg.src = birdFramesSrc[this.frame]
 
         this.gameFrame++
         this.dy += GRAVITY * dt
@@ -389,17 +390,12 @@ function init(){
     window.requestAnimationFrame(gameLoop)   
     bird = new Bird()
     birdImg = new Image()
-    //birdImg.src = birdFramesSrc[7]
+    birdImg.src = './images/owl2.png'
          
 }
 
 
-// hurtSound = new Audio('./sounds/hurt.wav')
-// jumpSound = new Audio('./sounds/jump.wav')
-// pauseSound = new Audio('./sounds/pause.wav')
-// scoreSound = new Audio('./sounds/score.wav')
-// explosionSound = new Audio('./sounds/explosion.wav')
-// gameMusic = new Audio('./sounds/marios_way.mp3')
+
 
 
 
