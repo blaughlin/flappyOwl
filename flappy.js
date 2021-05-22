@@ -194,6 +194,7 @@ class PlayState extends BaseState {
 
     enter(){
         scrolling = true 
+        dizzy = false
     }
     update(dt){
         if (!pause){  
