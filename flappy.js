@@ -165,6 +165,7 @@ class TitleScreenState extends BaseState{
         context.fillText("Flappy Owl", canvas.width/2, 100)
         context.font = "14px Flappy"
         context.fillText("Press Enter", canvas.width/2, 140)
+         context.fillText("press space bar to fly", canvas.width/2, 240)
     }
 }
 
@@ -408,11 +409,11 @@ class Bird{
         this.dy += GRAVITY * dt
         this.y += this.dy
 
-         if (spacePressed === true && !dizzy){
+         if (jump === true && !dizzy){
              this.dy -= 4
              
          }
-        spacePressed = false
+        jump = false
     }
     collides(pipe){
         if ( ((this.x +2) + (this.width -4) >= pipe.x) &&
@@ -471,16 +472,21 @@ let groundScroll = 0
 let backgroundScrollSpeed = 30
 let groundScrollSpeed = 60
 const BACKGROUND_LOOPING_POINT = 413
-let spacePressed = false
+let jump = false
 
+window.addEventListener('click', () => {
+            jump = true
+
+        if (gStateMachine.current.constructor.name ===  'PlayState' && !dizzy &&!pause){
+           jumpSound.play()
+        }})
 
 
 window.addEventListener('keydown', function(e){
-    console.log(e.code, 'down', spacePressed)
     if (e.code === "Space"){
-        spacePressed = true
+        jump = true
 
-        if (gStateMachine.current.constructor.name ===  'PlayState' && !dizzy){
+        if (gStateMachine.current.constructor.name ===  'PlayState' && !dizzy &&!pause){
            jumpSound.play()
         }
 
