@@ -41,16 +41,7 @@ explosionSound = new Audio('./sounds/explosion.wav')
 explosionSound.setAttribute("preload", "auto")
 gameMusic = new Audio('./sounds/marios_way.mp3')
 gameMusic.setAttribute("preload", "auto")
-const birdFramesSrc = [
-    './images/Idle/frame-1.png',
-    './images/Idle/frame-2.png',
-    './images/Idle/frame-3.png',
-    './images/Idle/frame-4.png',
-    './images/Idle/frame-5.png',
-    './images/Idle/frame-6.png',
-    './images/Idle/frame-7.png',
-    './images/Idle/frame-8.png'
-]
+
 
 // ---------------CLASSES-----------------------------------------  
 
@@ -171,7 +162,7 @@ class TitleScreenState extends BaseState{
         context.fillStyle = "white"
         context.font= "56px Flappy"
         context.textAlign = "center"
-        context.fillText("Flappy Bird", canvas.width/2, 100)
+        context.fillText("Flappy Owl", canvas.width/2, 100)
         context.font = "14px Flappy"
         context.fillText("Press Enter", canvas.width/2, 140)
     }
@@ -184,6 +175,7 @@ class PlayState extends BaseState {
         this.pipePairs = []
         this.timer = 0
         this.score = 0
+        this.medal = new Medal()
         this.lastY = -PIPE_HEIGHT + (Math.random() * (80-1) + 1) + 20
     }
     init(){
@@ -218,7 +210,6 @@ class PlayState extends BaseState {
         }
 
         this.bird.update(dt)
-
         if (this.bird.y > canvas.height -15){
             hurtSound.play()
             gameMusic.pause()
@@ -231,6 +222,7 @@ class PlayState extends BaseState {
             if (!element.scored){
                 if (element.x + PIPE_WIDTH < this.bird.x){
                     this.score += 1
+                    this.medal.update(this.score)
                     scoreSound.play()
                     element.scored = true
                 }
@@ -273,13 +265,39 @@ class PlayState extends BaseState {
 
         context.fillText(`Score: ${this.score}`, 8, 20)
         this.bird.render()
+        this.medal.render()
 
     }
     exit(){
         scrolling = false
     }
 }
+class Medal {
+    constructor(params){
+        this.width = 40
+        this.height = 81
+        this.x = 8
+        this.y = 25
+        this.score = 0
+    }
 
+    update(score){
+        this.score = score
+        console.log('score: ', this.score)
+        if (score > 2){
+            medalImage.src = "./images/gold.png"
+        } else if (score > 1){  
+            medalImage.src = "./images/silver.png"
+        }
+    }
+
+    render(){
+        if (this.score > 0){
+            context.drawImage(medalImage, this.x, this.y, 20, 40)
+
+        }    
+    }
+}
 class Pipe {
     constructor(orientation, y){
         this.image='./images/pipe.png'
@@ -358,7 +376,6 @@ class Bird{
         // context.drawImage(birdImg, this.x, this.y )
         if (dizzy){
             this.spriteHeightOrigin=1004
-            this.frame=0
         }
 
         context.drawImage(birdImg,this.frame * 1159,this.spriteHeightOrigin,
@@ -366,23 +383,32 @@ class Bird{
     }
 
     update(dt){
+        if (!dizzy){
+            if (this.gameFrame % this.staggerFrames === 0){
+                if (this.frame < 7)
+                {
+                    this.frame++
 
-        if (this.gameFrame % this.staggerFrames === 0){
-            if (this.frame < 7)
-            {
-                this.frame++
+                }else{
+                    this.frame = 0
 
-            }else{
-                this.frame = 0
+                }
+        }}else{
+            if (this.gameFrame % this.staggerFrames === 0){
+                if (this.frame < 1)
+                {
+                    this.frame++
 
-            }
+                }else{
+                    this.frame = 0
+                }}
         }
 
         this.gameFrame++
         this.dy += GRAVITY * dt
         this.y += this.dy
 
-         if (spacePressed === true){
+         if (spacePressed === true && !dizzy){
              this.dy -= 4
              
          }
@@ -438,6 +464,8 @@ const ground = new Image()
 ground.src = './images/ground.png'
 const pipeImage = new Image()
 pipeImage.src = './images/pipe.png'
+medalImage = new Image()
+medalImage.src = "./images/bronze.png"
 let backgroundScroll = 0
 let groundScroll = 0
 let backgroundScrollSpeed = 30
@@ -451,8 +479,11 @@ window.addEventListener('keydown', function(e){
     console.log(e.code, 'down', spacePressed)
     if (e.code === "Space"){
         spacePressed = true
-        jumpSound.src = './sounds/jump.wav'
-        jumpSound.play()
+
+        if (gStateMachine.current.constructor.name ===  'PlayState' && !dizzy){
+           jumpSound.play()
+        }
+
 
     } 
     if (e.code === 'Enter'){
