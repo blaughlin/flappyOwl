@@ -475,9 +475,15 @@ const BACKGROUND_LOOPING_POINT = 413
 let jump = false
 
 window.addEventListener('click', () => {
-            jump = true
+        if (gStateMachine.current.constructor.name ===  'TitleScreenState' || gStateMachine.current.constructor.name === 'ScoreState'){
+            returnKeyPressed = true
+            gameMusic.loop = true
+            gameMusic.play()
+            console.log('enter pressed')
+        }
 
         if (gStateMachine.current.constructor.name ===  'PlayState' && !dizzy &&!pause){
+            jump = true
            jumpSound.play()
         }})
 
