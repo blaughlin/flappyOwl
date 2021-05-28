@@ -23,7 +23,7 @@ const BIRD_WIDTH = 38
 const BIRD_HEIGHT = 24
 
 let lastY = -PIPE_HEIGHT + (Math.random() * (80-1) + 1) + 20
-
+const textColor = "brown"
 let scrolling = true
 let pause = false
 let dead = false
@@ -39,7 +39,7 @@ scoreSound = new Audio('./sounds/score.wav')
 scoreSound.setAttribute("preload", "auto")
 explosionSound = new Audio('./sounds/explosion.wav')
 explosionSound.setAttribute("preload", "auto")
-gameMusic = new Audio('./sounds/marios_way.mp3')
+gameMusic = new Audio('./sounds/happySong.mp3')
 gameMusic.setAttribute("preload", "auto")
 
 
@@ -108,8 +108,8 @@ class CountdownState extends BaseState {
     }
 
     render(){
-        context.fillStyle = "white"
-        context.font= "56px Flappy"
+        context.fillStyle = textColor
+        context.font= "56px Luckiest Guy"
         context.textAlign = "center"
         context.fillText(`${this.count}`, canvas.width/2, canvas.height/2)
     }
@@ -133,11 +133,11 @@ class ScoreState extends BaseState {
     }
 
     render(){
-        context.fillStyle = "white"
-        context.font= "56px Flappy"
+        context.fillStyle = textColor
+        context.font= "56px Luckiest Guy"
         context.textAlign = "center"
         context.fillText(`Final Score: ${this.score}`, canvas.width/2, 100)
-        context.font= "20px Flappy"
+        context.font= "20px Luckiest Guy"
         context.fillText('Press enter to play again', canvas.width/2, 150)
     }
 }
@@ -159,11 +159,11 @@ class TitleScreenState extends BaseState{
     }
 
     render(){
-        context.fillStyle = "white"
-        context.font= "56px Flappy"
+        context.fillStyle =  textColor
+        context.font= "56px Luckiest Guy"
         context.textAlign = "center"
         context.fillText("Flappy Owl", canvas.width/2, 100)
-        context.font = "14px Flappy"
+        context.font = "14px Luckiest Guy"
         context.fillText("Press Enter", canvas.width/2, 140)
          context.fillText("press space bar to fly", canvas.width/2, 240)
     }
@@ -243,8 +243,6 @@ class PlayState extends BaseState {
         for(let i=0; i< this.pipePairs.length; i++){
             if ( (this.bird.collides(this.pipePairs[i].pipes.upper)) || 
                  (this.bird.collides(this.pipePairs[i].pipes.lower)) ){
-                     //gStateMachine.change('title')
-                     //birdImg.src = './images/Dizzy/frame-1.png',
                      if (!dizzy){
                      explosionSound.play()
                      hurtSound.play()
@@ -256,9 +254,6 @@ class PlayState extends BaseState {
                      backgroundScrollSpeed = 0
                      groundScrollSpeed = 0
                      dead = true
-                     console.log('GAME OVER', dead)
-                     //setTimeout(()=>gStateMachine.change('score', this.score),600)
-                     //gStateMachine.change('score', this.score)
                      scrolling = false
             }
             this.pipePairs[i].update(dt)
@@ -279,8 +274,8 @@ class PlayState extends BaseState {
     render(){
         this.cloudSet.forEach((cloud) => cloud.render())
         this.pipePairs.forEach((pipe)=>pipe.render())
-        context.fillStyle = "white"
-        context.font= "24px MyFont"
+        context.fillStyle = textColor
+        context.font= "24px Luckiest Guy"
         context.textAlign = "start"
 
         context.fillText(`Score: ${this.score}`, 8, 20)
@@ -303,7 +298,6 @@ class Medal {
 
     update(score){
         this.score = score
-        console.log('score: ', this.score)
         if (score > 2){
             medalImage.src = "./images/gold.png"
         } else if (score > 1){  
@@ -355,7 +349,6 @@ class Pipe {
         this.x = canvas.width
         this.y = y
         this.orientation = orientation
-        //this.y = Math.random() * ((canvas.height -10) - (canvas.height/4)) + canvas.height/4
     }
     update(dt){
         //this.x = this.x + PIPE_SCROLL * dt
@@ -367,7 +360,6 @@ class Pipe {
             context.scale(1,-1)
             context.drawImage(pipeImage, this.x, (this.y + PIPE_HEIGHT)*-1)
             context.restore()
-            //context.setTransform(1, 0, 0, 1, 0, 0);
 
         }else{       
 
