@@ -1,34 +1,54 @@
-
-let canvas
-let context
 let secondsPassed = 0;
 let oldTimeStamp = 0;
-let fps
-
-let movingSpeed = 50
-let rectX = 0
-let rectY = 0
-
 let PIPE_SCROLL = -60
 let PIPE_SPEED = 60
 const GRAVITY = 10
 
 let pipes = []
 let pipePairs = []
-let pipeTimer = 0
-
 const PIPE_HEIGHT = 288
 const PIPE_WIDTH = 70
-const BIRD_WIDTH = 38
-const BIRD_HEIGHT = 24
 
-let lastY = -PIPE_HEIGHT + (Math.random() * (80-1) + 1) + 20
-const textColor = "brown"
-let scrolling = true
 let pause = false
-let dead = false
-let returnKeyPressed = false
 let dizzy = false
+let jump = false
+let returnKeyPressed = false
+
+let cloudSpeed =  100
+let backgroundScroll = 0
+let groundScroll = 0
+let bigMountainScroll = 0
+let midMountainScroll = 0
+let backgroundScrollSpeed = 30
+let groundScrollSpeed = 60
+const textColor = "brown"
+const BACKGROUND_LOOPING_POINT = 413
+
+
+
+// --------------- Images-----------------------------------------  
+const background = new Image()
+background.src = './images/background.png'
+const pauseImg = new Image()
+pauseImg.src = './images/pause.png'
+const ground = new Image()
+ground.src = './images/ground.png'
+const pipeImage = new Image()
+pipeImage.src = './images/pipe.png'
+medalImage = new Image()
+medalImage.src = "./images/bronze.png"
+cloudImage= new Image()
+cloudImage.src = "./images/clouds.png"
+hillsImage = new Image()
+hillsImage.src = "./images/long_hills.png"
+midMountainImage = new Image()
+midMountainImage.src = "./images/mountains.png"
+bigMountainImage= new Image()
+bigMountainImage.src = "./images/bigMountain.png"
+closeClouds = new Image()
+closeClouds.src = "./images/closeClouds.png"
+
+// ---------------Sound-----------------------------------------  
 hurtSound = new Audio('./sounds/hurt.wav')
 hurtSound.setAttribute("preload", "auto")
 jumpSound = new Audio('./sounds/jump.wav')
@@ -39,12 +59,13 @@ scoreSound = new Audio('./sounds/score.wav')
 scoreSound.setAttribute("preload", "auto")
 explosionSound = new Audio('./sounds/explosion.wav')
 explosionSound.setAttribute("preload", "auto")
+
+//https://freesound.org/people/Mativve/sounds/391538/
 gameMusic = new Audio('./sounds/happySong.mp3')
 gameMusic.setAttribute("preload", "auto")
 
 
 // ---------------CLASSES-----------------------------------------  
-
 
 class StateMachine {
     constructor(states={}){
@@ -99,7 +120,6 @@ class CountdownState extends BaseState {
             if (this.timer > this. COUNTDOWN_TIME){
                 this.timer = this.timer % this.COUNTDOWN_TIME
                 this.count = this.count - 1
-
                 if (this.count === 0){
                     gStateMachine.change('play')
                 }
@@ -121,13 +141,11 @@ class ScoreState extends BaseState {
     }
     enter(params){
         this.score = params
-        dead = false
     }
 
     update(dt){
         if (returnKeyPressed === true){
             returnKeyPressed = false
-            console.log('PLAY STATE')
             gStateMachine.change('countdown')
         }
     }
@@ -146,14 +164,12 @@ class TitleScreenState extends BaseState{
         super()
     }
     enter(){
-        scrolling = true
         PIPE_SCROLL = -60
         PIPE_SPEED = 60
     }
     update(dt){
         if (returnKeyPressed === true){
             returnKeyPressed = false
-            console.log('PLAY STATE')
             gStateMachine.change('countdown')
         }
     }
@@ -165,14 +181,13 @@ class TitleScreenState extends BaseState{
         context.fillText("Flappy Owl", canvas.width/2, 100)
         context.font = "14px Luckiest Guy"
         context.fillText("Press Enter", canvas.width/2, 140)
-         context.fillText("press space bar to fly", canvas.width/2, 240)
+        context.fillText("press space bar to fly", canvas.width/2, 240)
     }
 }
 
 class PlayState extends BaseState {
     constructor(){
         super()
-
         this.bird = new Bird()
         this.pipePairs = []
         this.cloudSet = []
@@ -183,15 +198,10 @@ class PlayState extends BaseState {
         this.lastY = -PIPE_HEIGHT + (Math.random() * (80-1) + 1) + 20
     }
     init(){
-        // this.bird = new Bird()
-        // this.pipePairs = []
-        // this.timer = 0
 
-        // this.lastY = -PIPE_HEIGHT + (Math.random() * (80-1) + 1) + 20
     }
 
     enter(){
-        scrolling = true 
         dizzy = false
         PIPE_SCROLL = -60
         PIPE_SPEED = 60
@@ -204,17 +214,15 @@ class PlayState extends BaseState {
         this.cloudTimer +=dt
     
         if (this.cloudTimer > getRandomInt(10,100)){  
-            console.log("create cloud")
             this.cloudSet.push(new Cloud())
             this.cloudTimer = 0
         }
 
         if (this.timer > getRandomInt(2,100)){
-            console.log('create pipe')
             // modify the last y coordinate we placed so pipe gaps aren't too far
             // no higher than 10 below the top edge of the screen, and
             // no lower than a gap length (90px) from the bottom
-            let y = Math.max(-PIPE_HEIGHT +10, Math.min(lastY + (Math.random() * (20+20)-20),canvas.height-90 -PIPE_HEIGHT))
+            let y = Math.max(-PIPE_HEIGHT +10, Math.min(this.lastY + (Math.random() * (20+20)-20),canvas.height-90 -PIPE_HEIGHT))
             this.lastY = y
             this.pipePairs.push(new PipePair(y))
             this.timer=0
@@ -225,7 +233,6 @@ class PlayState extends BaseState {
             hurtSound.play()
             gameMusic.pause()
             gStateMachine.change('score', this.score)
-            scrolling = false
 
         }
 
@@ -253,8 +260,6 @@ class PlayState extends BaseState {
                      PIPE_SCROLL = 0
                      backgroundScrollSpeed = 0
                      groundScrollSpeed = 0
-                     dead = true
-                     scrolling = false
             }
             this.pipePairs[i].update(dt)
             if (this.pipePairs[i].remove){
@@ -284,9 +289,9 @@ class PlayState extends BaseState {
 
     }
     exit(){
-        scrolling = false
     }
 }
+
 class Medal {
     constructor(params){
         this.width = 40
@@ -312,6 +317,7 @@ class Medal {
         }    
     }
 }
+
 class Cloud {
     constructor(){
         this.width = 800
@@ -329,7 +335,6 @@ class Cloud {
     render(){
         context.drawImage(cloudImage, 0, this.sprite_y, this.width, this.height, this.x, this.y, this.scale_x, this.scale_y)
     }
-
 
     update(dt){
         if (this.x > -this.width){
@@ -351,7 +356,7 @@ class Pipe {
         this.orientation = orientation
     }
     update(dt){
-        //this.x = this.x + PIPE_SCROLL * dt
+
     }
 
     render(){
@@ -364,7 +369,6 @@ class Pipe {
         }else{       
 
             context.drawImage(pipeImage, this.x, this.y)
-
         }
     }
 
@@ -377,7 +381,6 @@ class PipePair{
         this.gap = getRandomInt(90,160)
         this.remove = false
         this.pipes = {upper: new Pipe('top', this.y), lower: new Pipe('bottom', this.y + PIPE_HEIGHT + this.gap )}
-        this.score = false
     }
     update(dt){
         if (dizzy){PIPE_SPEED = 0}
@@ -399,8 +402,6 @@ class Bird{
     constructor(){
         this.width = 50
         this.height = 43
-        // this.width = 1157
-        // this.height = 1002
         this.x = canvas.width / 2 - (this.width/2)
         this.y = canvas.height / 2 - (this.height/2)
         this.dy = 0
@@ -413,8 +414,6 @@ class Bird{
 
     }
     render(){
-        //birdImg.src = birdFramesSrc[this.frame]
-        // context.drawImage(birdImg, this.x, this.y )
         if (dizzy){
             this.spriteHeightOrigin=1004
         }
@@ -455,6 +454,7 @@ class Bird{
          }
         jump = false
     }
+
     collides(pipe){
         if ( ((this.x +2) + (this.width -4) >= pipe.x) &&
              (this.x <= pipe.x + PIPE_WIDTH)){
@@ -468,10 +468,8 @@ class Bird{
     }
 }   
  
-
+// ---------------Game Logic-----------------------------------------  
 window.onload = init
-let bird
-let birdImg
 
 function init(){
     canvas = document.getElementById('canvas')
@@ -483,11 +481,6 @@ function init(){
          
 }
 
-
-
-
-
-
 const gStateMachine = new StateMachine({
     title: () => new TitleScreenState(),
     play: () => new PlayState(),
@@ -497,42 +490,12 @@ const gStateMachine = new StateMachine({
 
 gStateMachine.change('title')
 
-const background = new Image()
-background.src = './images/background.png'
-const pauseImg = new Image()
-pauseImg.src = './images/pause.png'
-const ground = new Image()
-ground.src = './images/ground.png'
-const pipeImage = new Image()
-pipeImage.src = './images/pipe.png'
-medalImage = new Image()
-medalImage.src = "./images/bronze.png"
-cloudImage= new Image()
-cloudImage.src = "./images/clouds.png"
-hillsImage = new Image()
-hillsImage.src = "./images/long_hills.png"
-midMountainImage = new Image()
-midMountainImage.src = "./images/mountains.png"
-bigMountainImage= new Image()
-bigMountainImage.src = "./images/bigMountain.png"
-closeClouds = new Image()
-closeClouds.src = "./images/closeClouds.png"
-let cloudSpeed =  100
-let backgroundScroll = 0
-let groundScroll = 0
-let bigMountainScroll = 0
-let midMountainScroll = 0
-let backgroundScrollSpeed = 30
-let groundScrollSpeed = 60
-const BACKGROUND_LOOPING_POINT = 413
-let jump = false
 
 window.addEventListener('click', () => {
         if (gStateMachine.current.constructor.name ===  'TitleScreenState' || gStateMachine.current.constructor.name === 'ScoreState'){
             returnKeyPressed = true
             gameMusic.loop = true
             gameMusic.play()
-            console.log('enter pressed')
         }
 
         if (gStateMachine.current.constructor.name ===  'PlayState' && !dizzy &&!pause){
@@ -552,10 +515,11 @@ window.addEventListener('keydown', function(e){
 
     } 
     if (e.code === 'Enter'){
+        if (gStateMachine.current.constructor.name ===  'TitleScreenState' || gStateMachine.current.constructor.name === 'ScoreState'){
         returnKeyPressed = true
         gameMusic.loop = true
         gameMusic.play()
-        console.log('enter pressed')
+        }
     }
     if (e.code === "KeyP"){
         pauseSound.play()
@@ -563,11 +527,6 @@ window.addEventListener('keydown', function(e){
     } 
 })
 
-function getRandomIntInclusive(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
-}
 
 function getRandomInt(min, max) {
   min = Math.ceil(min);
@@ -575,32 +534,6 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
 
-
-
-function gameLoop(timeStamp) {
-
-    // Calculate the number of seconds passed since the last frame
-    secondsPassed = (timeStamp - oldTimeStamp) / 1000;
-    // Move forward in time with a maximum amount
-    secondsPassed = Math.min(secondsPassed, 0.1)
-    oldTimeStamp = timeStamp;
-
-    // Calculate fps
-    fps = Math.round(1 / secondsPassed);
-    //console.log(fps)
-
-    // Perform the drawing operation
-    draw()
-
-  
-    //gStateMachine.update(secondsPassed)
-    update(secondsPassed)
-    
-
-
-    // The loop function has reached it's end. Keep requesting new frames
-    window.requestAnimationFrame(gameLoop);
-}
 
 function draw(){
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -618,8 +551,6 @@ function draw(){
     if (pause){
     context.drawImage(pauseImg, canvas.width/2-25, canvas.height/2-25) 
     }
-
- 
 }
 
 function update(secondsPassed){
@@ -631,8 +562,26 @@ function update(secondsPassed){
         groundScroll = (groundScroll + groundScrollSpeed * secondsPassed) % 2048
         bigMountainScroll = (bigMountainScroll + 30 * secondsPassed) % 2048
         midMountainScroll = (midMountainScroll  + 50 * secondsPassed) % 2048
-
-
-
     }
+}
+
+
+function gameLoop(timeStamp) {
+    // Calculate the number of seconds passed since the last frame
+    secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+    // Move forward in time with a maximum amount
+    secondsPassed = Math.min(secondsPassed, 0.1)
+    oldTimeStamp = timeStamp;
+
+    // Calculate fps
+    let fps = Math.round(1 / secondsPassed);
+
+    // Perform the drawing operation
+    draw()
+
+    //gStateMachine.update(secondsPassed)
+    update(secondsPassed)
+
+    // The loop function has reached it's end. Keep requesting new frames
+    window.requestAnimationFrame(gameLoop);
 }
