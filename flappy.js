@@ -49,6 +49,8 @@ closeClouds = new Image()
 closeClouds.src = "./images/closeClouds.png"
 
 // ---------------Sound-----------------------------------------  
+hootSound = new Audio('./sounds/hoot.m4a')
+hootSound.setAttribute("preload", "auto")
 hurtSound = new Audio('./sounds/hurt.wav')
 hurtSound.setAttribute("preload", "auto")
 jumpSound = new Audio('./sounds/jump.wav')
@@ -230,7 +232,8 @@ class PlayState extends BaseState {
 
         this.bird.update(dt)
         if (this.bird.y > canvas.height -15){
-            hurtSound.play()
+            hootSound.play()
+            //hurtSound.play()
             gameMusic.pause()
             gStateMachine.change('score', this.score)
 
@@ -470,10 +473,15 @@ class Bird{
  
 // ---------------Game Logic-----------------------------------------  
 window.onload = init
+let WIDTH = 512
+let HEIGHT = 288
+let CANVAS_WIDTH = 512
+let CANVAS_HEIGHT = 288
 
 function init(){
     canvas = document.getElementById('canvas')
     context = canvas.getContext('2d')
+
     window.requestAnimationFrame(gameLoop)   
     bird = new Bird()
     birdImg = new Image()
@@ -481,6 +489,26 @@ function init(){
          
 }
 
+let resizeCanvas = function(){
+    CANVAS_WIDTH = window.innerHeight -4
+    CANVAS_HEIGHT = window.innerHeight -4
+    let ratio = 1.77
+    if(CANVAS_HEIGHT < CANVAS_WIDTH / ratio){
+        CANVAS_WIDTH = CANVAS_HEIGHT * ratio
+    } else {
+        CANVAS_HEIGHT = CANVAS_WIDTH /ratio
+    }
+    canvas.width = WIDTH
+    canvas.height = HEIGHT
+    canvas.style.width = '' + CANVAS_WIDTH + 'px'
+    canvas.style.height = '' + CANVAS_HEIGHT + 'px'
+
+
+}
+
+resizeCanvas()
+
+window.addEventListener('resize', () => resizeCanvas())
 const gStateMachine = new StateMachine({
     title: () => new TitleScreenState(),
     play: () => new PlayState(),
