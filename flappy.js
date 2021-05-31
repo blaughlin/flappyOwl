@@ -567,8 +567,10 @@ function draw(){
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     // Background 
-    context.drawImage(background, -backgroundScroll, 0 )
+    //context.drawImage(background, -backgroundScroll, 0 )
     //context.drawImage(ground, -groundScroll, canvas.height - 16)
+    context.fillStyle = '#0396FF'
+    context.fillRect(0, 0, canvas.width, canvas.height);
     context.drawImage(closeClouds, -bigMountainScroll, canvas.height - 474)
 
     context.drawImage(bigMountainImage, -bigMountainScroll, canvas.height - 330)
@@ -585,7 +587,7 @@ function update(secondsPassed){
     if (!pause){
         gStateMachine.update(secondsPassed)
         // Background 
-        backgroundScroll = (backgroundScroll + backgroundScrollSpeed * secondsPassed) % BACKGROUND_LOOPING_POINT
+        //backgroundScroll = (backgroundScroll + backgroundScrollSpeed * secondsPassed) % BACKGROUND_LOOPING_POINT
         // groundScroll = (groundScroll + groundScrollSpeed * secondsPassed) % canvas.width
         groundScroll = (groundScroll + groundScrollSpeed * secondsPassed) % 2048
         bigMountainScroll = (bigMountainScroll + 30 * secondsPassed) % 2048
